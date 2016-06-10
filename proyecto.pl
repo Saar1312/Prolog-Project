@@ -48,8 +48,7 @@ numAristas([H|T],N):-
 % extremo inferior de la arista "Arista"
 % 
 % Variables:
-% 	- H: Primera arista de la lista          - T: Cola de la lista de aristas
-% 	- M: Numero de nodos bajo el nodo actual - N: Cantidad total de nodos 
+% 	- N: Cantidad total de nodos bajo la arista del nodo raiz.
 %------------------------------------------------------------------------------%
 
 aux(arista(_,Nodo),N):-
