@@ -1,23 +1,58 @@
 % Casos de prueba:
 % bienEtiquetado(nodo(4,[arista(3,nodo(1,[arista(2,nodo(3,[arista(1,nodo(2,[]))]))]))])).
+% bienEtiquetado(nodo(4,[arista(1,nodo(3,[])),arista(2,nodo(2,[])),arista(3,nodo(1,[]))])).
+
+% Anoche Wilmer dijo que si pueden haber etiquetas de aristas repetidas -.-
+% Podriamos dejarlo asi, porque dijo como que no les voy a exigir eso tambien porque
+% no queda mucho tiempo.
+
+%------------------------------------------------------------------------------%
+% bienEtiquetado(Arbol): Determina si un arbol dado esta bien etiquetado.
+% Dado un árbol A=(V,E) con |V|=N≥1 (y por lo tanto |E|=N-1) diremos que A está 
+% bien etiquetado si:
+%
+% 	- Para todo e perteneciente a E, si a y b son las etiquetas de sus extremos, 
+%	la etiqueta de la arista es    e=|a-b|
+%
+%	- etiquetas(V)={1, ... N}
+%
+%	- etiquetas(E)={1, ... N-1}
+%
+% Variables:
+%	- Arbol: Arbol a validar
+%	- N: Cantidad total de nodos de Arbol 
+%	- Aristas: Lista de las etiquetas de las aristas del arbol
+%	- Nodos: Lista con las etiquetas de los nodos del arbol
+%------------------------------------------------------------------------------%
 
 bienEtiquetado(Arbol):-
 	numNodos(Arbol,N),
-	nodoBienEt(N,[],[],Nodos,Aristas,Arbol),
+	nodoBienEt(N,[],[],Nodos,Aristas,0,0,Arbol),
 	noHayRepeticion(Nodos),
 	noHayRepeticion(Aristas).
 
-nodoBienEt(NumNodos,ENodos,EAristas,Nodos,Aristas,nodo(E,A)):-
+%------------------------------------------------------------------------------%
+% numNodos(Nodo,Cantidad_Nodos): Cuenta la cantidad de nodos de un arbol. Para
+% esto suma de forma recursiva el numero de descendientes y le suma uno.
+% 
+% Variables:
+% 	- A: Lista de aristas         - L: Numero de nodos bajo el nodo actual
+% 	- N: Cantidad total de nodos 
+%------------------------------------------------------------------------------%
+
+
+nodoBienEt(NumNodos,ENodos,EAristas,Nodos,Aristas,Padre,Rama,nodo(E,A)):-
 	etiquetaValida(NumNodos,E),
-	validarArista(NumNodos,ENodos,EAristas,E),
-	aristaBienEt(NumNodos,[E|ENodos],EAristas,Acum1,Acum2,A),
+	aristaValida(NumNodos,Padre,Rama,E),
+	aristaBienEt(NumNodos,[E|ENodos],EAristas,Acum1,Acum2,E,Rama,A),
 	Nodos = Acum1,
 	Aristas = Acum2.
 
-aristaBienEt(_,ENodos,EAristas,ENodos,EAristas,[]).
-aristaBienEt(NumNodos,ENodos,EAristas,Nodos,Aristas,[arista(E,Nodo)|T]):-
-	aristaBienEt(NumNodos,ENodos,EAristas,Acum1,Acum2,T),
-	nodoBienEt(NumNodos,Acum1,[E|Acum2],Acum3,Acum4,Nodo),
+
+aristaBienEt(_,ENodos,EAristas,ENodos,EAristas,_,_,[]).
+aristaBienEt(NumNodos,ENodos,EAristas,Nodos,Aristas,Padre,_,[arista(E,Nodo)|T]):-
+	aristaBienEt(NumNodos,ENodos,EAristas,Acum1,Acum2,Padre,E,T),
+	nodoBienEt(NumNodos,Acum1,[E|Acum2],Acum3,Acum4,Padre,E,Nodo),
 	Nodos = Acum3,
 	Aristas = Acum4.
 
@@ -26,8 +61,8 @@ etiquetaValida(N,E):-
 	E > 0,
 	E =< N.
 
-validarArista(_,[],[],_).
-validarArista(NumNodos,[N1|_],[E|_],N2):-
+aristaValida(_,0,0,_).
+aristaValida(NumNodos,N1,E,N2):-
 	NumAristas is NumNodos - 1,
 	etiquetaValida(NumAristas,E),
 	E =:= abs(N1-N2).
@@ -39,46 +74,47 @@ noHayRepeticion([H|T]):-
 
 %------------------------------------------------------------------------------%
 % numNodos(Nodo,Cantidad_Nodos): Cuenta la cantidad de nodos de un arbol. Para
-% esto suma el numero de elementos de la lista de aristas con el numero de nodos
-% de cada subarbol (esto es realizado por numAritas y aux)
+% esto suma de forma recursiva el numero de descendientes y le suma uno.
 % 
 % Variables:
-% 	- R: Etiqueta del nodo        - Len: Cantidad de aristas
-% 	- A: Lista de aristas         - M: Numero de nodos bajo el nodo actual
+% 	- A: Lista de aristas         - L: Numero de nodos bajo el nodo actual
 % 	- N: Cantidad total de nodos 
 %------------------------------------------------------------------------------%
 
 numNodos(nodo(_,[]),1).
 numNodos(nodo(_,A),N):-
-	numAristas(A,M),
-	length(A,Len),
-	N is Len + M.
+	aux(A,L),
+	N is L+1.
 
 %------------------------------------------------------------------------------%
-% numAristas(Aristas,Cantidad_Nodos): Permite recorrer la lista de aristas y
-% aplicar la funcion aux a cada elemento de esta lista.
+% aux(Aristas,Cantidad_Nodos): Permite recorrer la lista de aristas y
+% aplicar la funcion numNodos a cada nodo en el extremo inferior de cada arista.
 % 
 % Variables:
-% 	- H: Primera arista de la lista          - T: Cola de la lista de aristas
-% 	- M: Numero de nodos bajo el nodo actual - N: Cantidad total de nodos 
+% 	- A: Numero de nodos bajo el nodo actual - N: Cantidad total de nodos 
 %------------------------------------------------------------------------------%
 
-numAristas([],0). % Caso base, no eliminar
-numAristas([H|T],N):-
-	aux(H,M),
-	numAristas(T,A),
-	N is M+A.
-
-%------------------------------------------------------------------------------%
-% aux(Arista,Cantidad_Nodos): Permite ejecutar la funcion numNodos al nodo del
-% extremo inferior de la arista "Arista"
-% 
-% Variables:
-% 	- N: Cantidad total de nodos bajo la arista del nodo raiz.
-%------------------------------------------------------------------------------%
-
-aux(arista(_,Nodo),N):-
-	numNodos(Nodo,N).
+aux([],0).
+aux([arista(_,Nodo)|T],N):-
+	numNodos(Nodo,Acum),
+	aux(T,Acum2),
+	N is Acum + Acum2.
 
 % Caso de prueba numNodos(nodo(4,[arista(1,nodo(4,[arista(1,nodo(3,[])),arista(2,nodo(4,[arista(1,nodo(3,[])),arista(2,nodo(2,[])),arista(3,nodo(1,[]))])),arista(3,nodo(1,[]))])),arista(2,nodo(2,[])),arista(3,nodo(1,[]))]),N).
 
+
+/*
+nodoBienEt(NumNodos,ENodos,EAristas,Nodos,Aristas,nodo(E,A)):-
+	etiquetaValida(NumNodos,E),
+	aristaValida(NumNodos,ENodos,EAristas,E),
+	aristaBienEt(NumNodos,[E|ENodos],EAristas,Acum1,Acum2,A),
+	Nodos = Acum1,
+	Aristas = Acum2.
+
+aristaBienEt(_,ENodos,EAristas,ENodos,EAristas,[]).
+aristaBienEt(NumNodos,ENodos,EAristas,Nodos,Aristas,[arista(E,Nodo)|T]):-
+	aristaBienEt(NumNodos,ENodos,EAristas,Acum1,Acum2,T),
+	nodoBienEt(NumNodos,Acum1,[E|Acum],Acum3,Acum4,Nodo),
+	Nodos = Acum3,
+	Aristas = Acum4.
+*/
