@@ -1,15 +1,41 @@
-%bienEtiquetado(nodo(_,[])).
-%bienEtiquetado(arbol):- numNodos(arbol,N), validar(N,arbol).
-%bienEtiquetado().
+% Casos de prueba:
+% bienEtiquetado(nodo(4,[arista(3,nodo(1,[arista(2,nodo(3,[arista(1,nodo(2,[]))]))]))])).
 
+bienEtiquetado(Arbol):-
+	numNodos(Arbol,N),
+	nodoBienEt(N,[],[],Nodos,Aristas,Arbol),
+	noHayRepeticion(Nodos),
+	noHayRepeticion(Aristas).
 
-%validar(N,nodo(R,[])):- integer(), validarEtiqueta(N,R)
+nodoBienEt(NumNodos,ENodos,EAristas,Nodos,Aristas,nodo(E,A)):-
+	etiquetaValida(NumNodos,E),
+	validarArista(NumNodos,ENodos,EAristas,E),
+	aristaBienEt(NumNodos,[E|ENodos],EAristas,Acum1,Acum2,A),
+	Nodos = Acum1,
+	Aristas = Acum2.
 
-%validarEtiqueta(N,R):-
-%	R > 0,
-%	R =< N.
+aristaBienEt(_,ENodos,EAristas,ENodos,EAristas,[]).
+aristaBienEt(NumNodos,ENodos,EAristas,Nodos,Aristas,[arista(E,Nodo)|T]):-
+	aristaBienEt(NumNodos,ENodos,EAristas,Acum1,Acum2,T),
+	nodoBienEt(NumNodos,Acum1,[E|Acum2],Acum3,Acum4,Nodo),
+	Nodos = Acum3,
+	Aristas = Acum4.
 
-% Esto se podria unir en la misma funcion quiza.
+etiquetaValida(N,E):-
+	integer(E),
+	E > 0,
+	E =< N.
+
+validarArista(_,[],[],_).
+validarArista(NumNodos,[N1|_],[E|_],N2):-
+	NumAristas is NumNodos - 1,
+	etiquetaValida(NumAristas,E),
+	E =:= abs(N1-N2).
+
+noHayRepeticion([]).
+noHayRepeticion([H|T]):-
+	not(member(H,T)),
+	noHayRepeticion(T).
 
 %------------------------------------------------------------------------------%
 % numNodos(Nodo,Cantidad_Nodos): Cuenta la cantidad de nodos de un arbol. Para
@@ -22,7 +48,7 @@
 % 	- N: Cantidad total de nodos 
 %------------------------------------------------------------------------------%
 
-numNodos(nodo(R,[]),0):- integer(R). % Hace falta este integer(R)? Si no, quitar R
+numNodos(nodo(_,[]),1).
 numNodos(nodo(_,A),N):-
 	numAristas(A,M),
 	length(A,Len),
@@ -55,3 +81,4 @@ aux(arista(_,Nodo),N):-
 	numNodos(Nodo,N).
 
 % Caso de prueba numNodos(nodo(4,[arista(1,nodo(4,[arista(1,nodo(3,[])),arista(2,nodo(4,[arista(1,nodo(3,[])),arista(2,nodo(2,[])),arista(3,nodo(1,[]))])),arista(3,nodo(1,[]))])),arista(2,nodo(2,[])),arista(3,nodo(1,[]))]),N).
+
