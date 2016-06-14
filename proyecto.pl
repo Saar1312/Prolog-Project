@@ -18,6 +18,10 @@
 %
 %	- etiquetas(E)={1, ... N-1}
 %
+%	Se ha asumido que en un arbol bien etiquetado no pueden haber etiquetas de 
+% nodos o aristas repetidas. Por esta razon se realiza la evaluacion del predicado
+% noHayRepeticion sobre la lista de etiquetas de nodos y aristas del arbol.
+%
 % Variables:
 %	- Arbol: Arbol a validar
 %	- N: Cantidad total de nodos de Arbol 
@@ -32,14 +36,27 @@ bienEtiquetado(Arbol):-
 	noHayRepeticion(Aristas).
 
 %------------------------------------------------------------------------------%
-% numNodos(Nodo,Cantidad_Nodos): Cuenta la cantidad de nodos de un arbol. Para
-% esto suma de forma recursiva el numero de descendientes y le suma uno.
-% 
+% nodoBienEt(NumNodos,ENodos,EAristas,Nodos,Aristas,Padre,Rama,Nodo): 
+%
+% 	Este predicado valida la etiqueta del nodo actual "Nodo" evaluando esta etiqueta
+% por medio del predicado etiquetaValida. Ademas permite saber si una arista
+% cumple con la condicion e=|a-b| de los arboles bien etiquetados. Luego permite
+% recorrer de forma recursiva el arbol recorriendo las aristas por medio del predicado 
+% aristaBienEt. Finalmente utiliza acumuladores para unificar la lista de etiquetas
+% de nodos y aristas con las variables Nodos y Aristas.
+%
 % Variables:
-% 	- A: Lista de aristas         - L: Numero de nodos bajo el nodo actual
-% 	- N: Cantidad total de nodos 
+%	- NumNodos: Cantidad total de nodos
+%	- ENodos: Lista con etiquetas de aristas que va acumulando estos valores para
+%			finalmente obtener la lista de nodos del arbol.
+%	- EAristas: Lista con etiquetas de aristas que va acumulando estos valores para
+%			finalmente obtener la lista de aristas del arbol.
+%	- Nodos: Lista de etiquetas de nodos
+%	- Aristas: Lista de etiquetas de aristas 
+%	- Padre: Etiqueta del nodo padre del nodo actual (permite verificar la arista)
+%	- Rama: Etiqueta de la arista que une al nodo actual con su padre
+%	- Nodo: Nodo actual
 %------------------------------------------------------------------------------%
-
 
 nodoBienEt(NumNodos,ENodos,EAristas,Nodos,Aristas,Padre,Rama,nodo(E,A)):-
 	etiquetaValida(NumNodos,E),
@@ -48,6 +65,21 @@ nodoBienEt(NumNodos,ENodos,EAristas,Nodos,Aristas,Padre,Rama,nodo(E,A)):-
 	Nodos = Acum1,
 	Aristas = Acum2.
 
+%------------------------------------------------------------------------------%
+% aristaBienEt(NumNodos,ENodos,EAristas,Nodos,Aristas,Padre,Rama,Arista): 
+% 
+% Variables:
+%	- NumNodos: Cantidad total de nodos
+%	- ENodos: Lista con etiquetas de aristas que va acumulando estos valores para
+%			finalmente obtener la lista de nodos del arbol.
+%	- EAristas: Lista con etiquetas de aristas que va acumulando estos valores para
+%			finalmente obtener la lista de aristas del arbol.
+%	- Nodos: Lista de etiquetas de nodos
+%	- Aristas: Lista de etiquetas de aristas 
+%	- Padre: Etiqueta del nodo padre del nodo actual (permite verificar la arista)
+%	- Rama: Etiqueta de la arista que une al nodo actual con su padre
+%	- Arista: Arista actual
+%------------------------------------------------------------------------------%
 
 aristaBienEt(_,ENodos,EAristas,ENodos,EAristas,_,_,[]).
 aristaBienEt(NumNodos,ENodos,EAristas,Nodos,Aristas,Padre,_,[arista(E,Nodo)|T]):-
@@ -56,16 +88,49 @@ aristaBienEt(NumNodos,ENodos,EAristas,Nodos,Aristas,Padre,_,[arista(E,Nodo)|T]):
 	Nodos = Acum3,
 	Aristas = Acum4.
 
+%------------------------------------------------------------------------------%
+% etiquetaValida(NumNodos,Etiqueta_a_validar): Determina si una etiqueta cumple 
+% con las restricciones: 
+%
+%	- etiquetas(V)={1, ... N}
+%	- etiquetas(E)={1, ... N-1}
+% 
+% Variables:
+% 	- E: Etiqueta de un nodo o una arista
+% 	- N: Cantidad total de nodos 
+%------------------------------------------------------------------------------%
+
 etiquetaValida(N,E):-
 	integer(E),
 	E > 0,
 	E =< N.
+
+%------------------------------------------------------------------------------%
+% aristaValida(NumNodos,Etiqueta_padre,Etiqueta_arista,Etiqueta_hijo): Determina 
+% si una arista cumple con la restriccion e=|a-b|.
+% 
+% Variables:
+%
+% 	- NumNodos: Cantidad total de nodos
+% 	- N1: Etiqueta del nodo padre
+% 	- N2: Etiqueta del nodo hijo
+% 	- E: Etiqueta de la arista
+%------------------------------------------------------------------------------%
 
 aristaValida(_,0,0,_).
 aristaValida(NumNodos,N1,E,N2):-
 	NumAristas is NumNodos - 1,
 	etiquetaValida(NumAristas,E),
 	E =:= abs(N1-N2).
+
+%------------------------------------------------------------------------------%
+% noHayRepeticion(Lista): Determina si una lista no posee repeticiones. Por lo tanto
+% el predicado sera verdadero en caso de que Lista no contenga elementos repetidos.
+% 
+% Variables:
+%
+% 	- Lista ([H|T]): 
+%------------------------------------------------------------------------------%
 
 noHayRepeticion([]).
 noHayRepeticion([H|T]):-
@@ -88,7 +153,7 @@ numNodos(nodo(_,A),N):-
 
 %------------------------------------------------------------------------------%
 % aux(Aristas,Cantidad_Nodos): Permite recorrer la lista de aristas y
-% aplicar la funcion numNodos a cada nodo en el extremo inferior de cada arista.
+% evaluar el predicado numNodos a cada nodo en el extremo inferior de cada arista.
 % 
 % Variables:
 % 	- A: Numero de nodos bajo el nodo actual - N: Cantidad total de nodos 
@@ -101,20 +166,3 @@ aux([arista(_,Nodo)|T],N):-
 	N is Acum + Acum2.
 
 % Caso de prueba numNodos(nodo(4,[arista(1,nodo(4,[arista(1,nodo(3,[])),arista(2,nodo(4,[arista(1,nodo(3,[])),arista(2,nodo(2,[])),arista(3,nodo(1,[]))])),arista(3,nodo(1,[]))])),arista(2,nodo(2,[])),arista(3,nodo(1,[]))]),N).
-
-
-/*
-nodoBienEt(NumNodos,ENodos,EAristas,Nodos,Aristas,nodo(E,A)):-
-	etiquetaValida(NumNodos,E),
-	aristaValida(NumNodos,ENodos,EAristas,E),
-	aristaBienEt(NumNodos,[E|ENodos],EAristas,Acum1,Acum2,A),
-	Nodos = Acum1,
-	Aristas = Acum2.
-
-aristaBienEt(_,ENodos,EAristas,ENodos,EAristas,[]).
-aristaBienEt(NumNodos,ENodos,EAristas,Nodos,Aristas,[arista(E,Nodo)|T]):-
-	aristaBienEt(NumNodos,ENodos,EAristas,Acum1,Acum2,T),
-	nodoBienEt(NumNodos,Acum1,[E|Acum],Acum3,Acum4,Nodo),
-	Nodos = Acum3,
-	Aristas = Acum4.
-*/
