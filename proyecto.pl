@@ -7,9 +7,10 @@
 % no queda mucho tiempo.
 
 %------------------------------------------------------------------------------%
-% bienEtiquetado(Arbol): Determina si un arbol dado esta bien etiquetado.
-% Dado un árbol A=(V,E) con |V|=N≥1 (y por lo tanto |E|=N-1) diremos que A está 
-% bien etiquetado si:
+% bienEtiquetado(Arbol): 
+%
+%	Determina si un arbol dado esta bien etiquetado. Dado un árbol A=(V,E) con 
+% |V|=N≥1 (y por lo tanto |E|=N-1) diremos que A está bien etiquetado si:
 %
 % 	- Para todo e perteneciente a E, si a y b son las etiquetas de sus extremos, 
 %	la etiqueta de la arista es    e=|a-b|
@@ -67,7 +68,10 @@ nodoBienEt(NumNodos,ENodos,EAristas,Nodos,Aristas,Padre,Rama,nodo(E,A)):-
 
 %------------------------------------------------------------------------------%
 % aristaBienEt(NumNodos,ENodos,EAristas,Nodos,Aristas,Padre,Rama,Arista): 
-% 
+%
+%	Permite evaluar el predicado nodoBienEt de forma recursiva recorriendo las aristas
+% del arbol.
+%
 % Variables:
 %	- NumNodos: Cantidad total de nodos
 %	- ENodos: Lista con etiquetas de aristas que va acumulando estos valores para
@@ -106,8 +110,9 @@ etiquetaValida(N,E):-
 	E =< N.
 
 %------------------------------------------------------------------------------%
-% aristaValida(NumNodos,Etiqueta_padre,Etiqueta_arista,Etiqueta_hijo): Determina 
-% si una arista cumple con la restriccion e=|a-b|.
+% aristaValida(NumNodos,Etiqueta_padre,Etiqueta_arista,Etiqueta_hijo): 
+%
+%	Determina si una arista cumple con la restriccion e=|a-b|.
 % 
 % Variables:
 %
@@ -124,7 +129,9 @@ aristaValida(NumNodos,N1,E,N2):-
 	E =:= abs(N1-N2).
 
 %------------------------------------------------------------------------------%
-% noHayRepeticion(Lista): Determina si una lista no posee repeticiones. Por lo tanto
+% noHayRepeticion(Lista): 
+%
+%	Determina si una lista no posee repeticiones. Por lo tanto
 % el predicado sera verdadero en caso de que Lista no contenga elementos repetidos.
 % 
 % Variables:
@@ -138,7 +145,9 @@ noHayRepeticion([H|T]):-
 	noHayRepeticion(T).
 
 %------------------------------------------------------------------------------%
-% numNodos(Nodo,Cantidad_Nodos): Cuenta la cantidad de nodos de un arbol. Para
+% numNodos(Nodo,Cantidad_Nodos): 
+%
+%	Cuenta la cantidad de nodos de un arbol. Para
 % esto suma de forma recursiva el numero de descendientes y le suma uno.
 % 
 % Variables:
@@ -152,7 +161,9 @@ numNodos(nodo(_,A),N):-
 	N is L+1.
 
 %------------------------------------------------------------------------------%
-% aux(Aristas,Cantidad_Nodos): Permite recorrer la lista de aristas y
+% aux(Aristas,Cantidad_Nodos): 
+%
+%	Permite recorrer la lista de aristas y
 % evaluar el predicado numNodos a cada nodo en el extremo inferior de cada arista.
 % 
 % Variables:
