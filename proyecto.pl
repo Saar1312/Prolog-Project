@@ -177,3 +177,97 @@ aux([arista(_,Nodo)|T],N):-
 	N is Acum + Acum2.
 
 % Caso de prueba numNodos(nodo(4,[arista(1,nodo(4,[arista(1,nodo(3,[])),arista(2,nodo(4,[arista(1,nodo(3,[])),arista(2,nodo(2,[])),arista(3,nodo(1,[]))])),arista(3,nodo(1,[]))])),arista(2,nodo(2,[])),arista(3,nodo(1,[]))]),N).
+/*
+esqueleto(N,R,Esqueleto):-
+	aux(N,R,0,Esqueleto).
+
+aux(0,_,_,nil). % Si pasan esqueleto(0,1,Arbol), que evalua?
+aux(1,_,_,).
+aux(N,R,0,Esqueleto):-
+	R =< N-1,% ! para que no busque mas si la aridad esta mala?
+	aux2([1],N,R,Hijos)
+	esq(Hijos).
+
+aux2(1,)
+aux2(Padres,N,[H|T],Hijos):-
+	numHijos(H,N),
+	N =:= length(H2),
+	esNoCreciente(H2).
+
+cantidadHijos(L,)
+
+----------------------------------
+esqueleto(N,R,esq(Esqueleto)):-
+	N > 0,
+	R > 0,
+	esEsqueleto(N,R,[1],Esqueleto,NumNodos),
+	NumNodos == N.
+
+esEsqueleto(_,_,_,[[]],0).
+esEsqueleto(N,R,Padres,[H|T],Acum):-
+	numHijos(Padres,Hijos),
+	length(H,Len),
+	Hijos =:= Len,
+	headNTail(H,H1,T1),
+	esNoCreciente(T1,H1),
+	esEsqueleto(N,R,H,[T],M),
+	Acum is M + Hijos.
+
+headNTail([H|T],H,T).
+
+numHijos([],0).
+numHijos([H|T],N):-
+	numHijos(T,M),
+	N is H+M.
+
+esNoCreciente([],_).
+esNoCreciente([H|T],Head):-
+	Head >= H,
+	esNoCreciente(T,H).
+-----------------------------
+
+
+esqueleto(N,R,esq(Esqueleto)):-
+	esEsqueleto(N,R,[1],Esqueleto),
+	contarNodos(Esqueleto,M),
+	M == N.
+
+contarNodos([],0).
+contarNodos([H|T],NumNodos):-
+	numHijos(H,M),
+	contarNodos(T,Acum),
+	NumNodos is Acum + M.
+
+
+esEsqueleto(_,_,_,[[]],0).
+esEsqueleto(N,R,Padres,[H|T]):-
+	numHijos(Padres,Hijos),
+	length(H,Len),
+	Hijos =:= Len,
+	headNTail(H,H1,T1),
+	esNoCreciente(T1,H1),
+	esEsqueleto(N,R,H,[T]).
+
+headNTail([H|T],H,T).
+
+numHijos([],0).
+numHijos([H|T],N):-
+	numHijos(T,M),
+	N is H+M.
+
+esNoCreciente([],_).
+esNoCreciente([H|T],Head):-
+	Head >= H,
+	esNoCreciente(T,H).
+*/
+
+arbolBin(0,nill).
+arbolBin(N,nill):-
+	N<0.
+arbolBin(N,Arbol):-
+	N > 0,
+	N1 is N-1,
+	arbolBin(N1,Arbol1),
+	N2 is N1-1,
+	arbolBin(N2,Arbol2),
+	Arbol = arb(Arbol1,Arbol2).
