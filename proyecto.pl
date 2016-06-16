@@ -282,8 +282,7 @@ esqueleto(N,R,Esqueleto):-
 
 esqueleto1(0,_,Len,Lista):-
 	zero(Len,Ceros),
-	Lista = [Ceros].
-
+	Lista = [Ceros],!.
 esqueleto1(N,R,NumHijos,Niveles):-
 	esqueleto2(N,R,NumHijos,Hijos,M), % M: Cantidad de nodos en el siguiente nivel
 	NumNodos is N - M,
