@@ -313,3 +313,12 @@ zero(Len,Lista):-
 	Restantes is Len - 1,
 	zero(Restantes,Lista2),
 	Lista = [0|Lista2].
+
+%--------------------------------------------------------
+describirEtiquetamiento(nodo(E,As)) :- write('Nodo '), write(E), write('\n'),imprimir(As,2).
+
+imprimir([],P).
+imprimir([arista(X,Z)|XS],Depth):- tab(Depth), write('Arista '), write(X), write('\n'), Newdepth is Depth+2, inodo(Z,Newdepth), imprimir(XS,Depth).
+
+inodo(nodo(E,As),Depth):- tab(Depth), write('Nodo '), write(E), write('\n'), Newdepth is Depth+2, imprimir(As,Newdepth).
+%--------------------------------------------------------
