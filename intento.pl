@@ -363,23 +363,7 @@ remove(C, [C|N], N) :- !.
 remove(C, [A|L1], [A|L2]) :-
     remove(C, L1, L2).
 
-construidoI([[NumHijos]|Nhs],N,R,Arbol):-
-	rango(N,EtiquetasNodo,1),
-	member(Padre,EtiquetasNodo),
-	remove(Padre,EtiquetasNodo,NewEtiquetasNodo),
-	Nodos=[Padre],
-	%%Tengo que conseguir una lista con NumHijos hijos entre N y 1
-	conseguirLista([], NumHijos,NewEtiquetasNodo,ListaNodos,RestoEtiquetas),
-	conseguirArista(Padre,ListaNodos,ListaAristas),
-	Arbol=nodo(Padre,arista())
-	Aux(ListaAristas,ListaNodos,Nhs,RestoEtiquetas,Aristas),
-	Arbol = nodo(Padre,Aristas).
-
-aux([LA|LAS],[LN,LNS],[[NumHijos|Resto]|Nhs],RestoEtiquetas,Aristas):-
-	Aristas=[arista(LA)|construidoI]
-
 conseguirLista(Nodos,0,EtiquetasNodo,Lista,S):- Lista = Nodos,RestoEtiquetas=EtiquetasNodo.
-
 conseguirLista(Nodos,Cantidad,EtiquetasNodo,Lista,RestoEtiquetas):-
 	member(Hijo, EtiquetasNodo),
 	remove(Hijo,EtiquetasNodo,NewEtiquetasNodo),
@@ -392,6 +376,19 @@ conseguirArista(Padre,[LN|LNS],ListaAristas):-
 	EA is abs(Padre-LN),
 	conseguirArista(Padre,LNS,ListaA),
 	concat([EA],ListaA,ListaAristas).
+
+construido([Numh|Nhs],EtiquetasNodo,Arbol):-
+	member(Padre,EtiquetasNodo),
+	remove(Padre,EtiquetasNodo,NewEtiquetasNodo),
+	conseguirLista([], NumHijos,NewEtiquetasNodo,ListaNodos,RestoEtiquetas),
+	conseguirArista(Padre,ListaNodos,ListaAristas),
+	Arbol=nodo(Padre,arista())
+	Aux(ListaAristas,ListaNodos,Nhs,RestoEtiquetas,Aristas),
+	Arbol = nodo(Padre,Aristas).
+
+aux([LA|LAS],[LN,LNS],[[NumHijos|Resto]|Nhs],RestoEtiquetas,Aristas):-
+	Aristas=[arista(LA,construidoI([LN]|))|]
+
 
 %nodo(1,[arista(2,nodo(3,[])),arista(4,nodo(5,[]))])
 /*construido(N,R,Padre,[[0|_]|Nhs],Aristas):- Aristas = [].
