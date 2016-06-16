@@ -277,7 +277,7 @@ arbolBin(N,Arbol):-
 esqueleto(N,R,Esqueleto):-
 	N > 0,
 	R > 0,
-	N2 is N-1,
+	N2 is N-1, % Ojo, si falla, quitar esta linea
 	esqueleto1(N2,R,1,Hijos),
 	Esqueleto = esq(Hijos).
 
@@ -315,9 +315,15 @@ zero(Len,Lista):-
 	zero(Restantes,Lista2),
 	Lista = [0|Lista2].
 
+%--------------------------------------------------------
+describirEtiquetamiento(nodo(E,As)) :- write('Nodo '), write(E), write('\n'),imprimir(As,2).
 
+imprimir([],P).
+imprimir([arista(X,Z)|XS],Depth):- tab(Depth), write('Arista '), write(X), write('\n'), Newdepth is Depth+2, inodo(Z,Newdepth), imprimir(XS,Depth).
 
-
+inodo(nodo(E,As),Depth):- tab(Depth), write('Nodo '), write(E), write('\n'), Newdepth is Depth+2, imprimir(As,Newdepth).
+%--------------------------------------------------------
+/*
 etiquetamiento(Esqueleto,Arbol):-
 	evaluar(Esqueleto,NumNodos,Aridad),
 	construido(NumNodos,Aridad,0,0,Arbol).
@@ -389,7 +395,7 @@ aristaValida(NumNodos,N1,E,N2):-
 
 
 
-/*
+
 construido(N,R,Arbol):-
 	rango(N,EtiquetasNodo,1),
 	member(Nodo,EtiquetasNodo),
