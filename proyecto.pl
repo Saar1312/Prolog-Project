@@ -277,7 +277,8 @@ arbolBin(N,Arbol):-
 esqueleto(N,R,Esqueleto):-
 	N > 0,
 	R > 0,
-	esqueleto1(N,R,1,Hijos),
+	N2 is N-1,
+	esqueleto1(N2,R,1,Hijos),
 	Esqueleto = esq(Hijos).
 
 esqueleto1(0,_,Len,Lista):-
@@ -313,3 +314,93 @@ zero(Len,Lista):-
 	Restantes is Len - 1,
 	zero(Restantes,Lista2),
 	Lista = [0|Lista2].
+
+
+
+
+etiquetamiento(Esqueleto,Arbol):-
+	evaluar(Esqueleto,NumNodos,Aridad),
+	construido(NumNodos,Aridad,0,0,Arbol).
+
+evaluar(esq(Lista),NumNodos,Aridad):-
+	nodosTotales(Lista,NumNodos),
+	aridadEsqueleto(Lista,Aridad).
+
+nodosTotales([],0).
+nodosTotales([H|T],NumNodos):-
+	numHijos(H,N),
+	nodosTotales(T,M),
+	NumNodos is N + M.
+
+aridadEsqueleto([],0).
+aridadEsqueleto([H|T],Aridad):-
+	length(H,N),
+	aridadEsqueleto(T,M),
+	Aridad is max(N,M).
+
+max(X,Y,N):-
+	X=<Y,
+	N is Y.
+max(X,Y,N):-
+	X>Y,
+	N is X.
+
+numHijos([],0).
+numHijos([H|T],N):-
+	numHijos(T,M),
+	N is H+M.
+
+construido(N,R,Padre,Arista,Arbol):-
+	rango(N,EtiquetasNodo,1),
+	member(Nodo,EtiquetasNodo),
+	aristaValida(),
+	Restantes is N - 1,
+	construido2(Restantes,N,Aristas) % N: Numero de aristas + 1, Restantes: Num Nodos restantes
+	Arbol = nodo(Nodo,Aristas). % = o is?
+
+construido2(N,R,Padre,Aristas):-
+	M is N - 1,
+	rango(M,EtiquetasArista,1),
+	member(Arista,EtiquetasArista),
+	construido(M,R,Padre,Arista,Nodo),
+	Aristas = [arista(Arista,Nodo)]. % = o is?
+
+
+
+
+
+
+
+aristaValida(_,0,0,_).
+aristaValida(NumNodos,N1,E,N2):-
+	NumAristas is NumNodos - 1,
+	etiquetaValida(NumAristas,E),
+	E =:= abs(N1-N2).
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+construido(N,R,Arbol):-
+	rango(N,EtiquetasNodo,1),
+	member(Nodo,EtiquetasNodo),
+	Restantes is N - 1,
+	construido2(Restantes,N,Aristas) % N: Numero de aristas + 1, Restantes: Num Nodos restantes
+	Arbol = nodo(Nodo,Aristas). % = o is?
+
+construido2(N,R,Aristas):-
+	M is N - 1,
+	rango(M,EtiquetasArista,1),
+	member(Arista,EtiquetasArista),
+	construido(M,R,Nodo),
+	Aristas = [arista(Arista,Nodo)] % = o is?
+*/
