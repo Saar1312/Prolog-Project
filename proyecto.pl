@@ -259,7 +259,7 @@ esNoCreciente([],_).
 esNoCreciente([H|T],Head):-
 	Head >= H,
 	esNoCreciente(T,H).
-*/
+
 
 arbolBin(0,nill).
 arbolBin(N,nill):-
@@ -271,3 +271,37 @@ arbolBin(N,Arbol):-
 	N2 is N1-1,
 	arbolBin(N2,Arbol2),
 	Arbol = arb(Arbol1,Arbol2).
+
+*/
+
+esqueleto(N,R,Esqueleto):-
+	N > 0,
+	R > 0,
+	esqueleto1(N,R,1,Hijos),
+	Esqueleto = esq(Hijos).
+
+esqueleto1(_,_,0,[]).
+esqueleto1(N,R,NumHijos,Niveles):-
+	esqueleto2(N,R,NumHijos,Hijos,M), % M: Cantidad de nodos en el siguiente nivel
+	NumNodos is N - M,
+	esqueleto1(N,R,NumNodos,Nivel),
+	Niveles = [Hijos|Nivel].
+
+esqueleto2(0,_,_,[],0).
+esqueleto2(N,R,Len,Nivel,M):-
+	rango(N,Opciones,1),
+	member(NumHijos,Opciones),
+	NumHijos =< R, % Cada cantidad de hijos que se escoja debe ser menor que la aridad
+	Restantes is N - NumHijos,
+	Length is Len - 1,
+	esqueleto2(Restantes,R,Length,NivelNuevo,M2),
+	M is M2 + NumHijos,
+	Nivel = [NumHijos|NivelNuevo].
+
+rango(N,Lista,N):-
+	Lista = [N].
+rango(N,Lista,Acum):-
+	Acum < N,
+	Acum2 is Acum + 1,
+	rango(N,Lista2,Acum2),
+	Lista = [Acum|Lista2].
