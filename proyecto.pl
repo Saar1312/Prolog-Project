@@ -318,7 +318,7 @@ zero(Len,Lista):-
 %--------------------------------------------------------
 describirEtiquetamiento(nodo(E,As)) :- write('Nodo '), write(E), write('\n'),imprimir(As,2).
 
-imprimir([],P).
+imprimir([],_).
 imprimir([arista(X,Z)|XS],Depth):- tab(Depth), write('Arista '), write(X), write('\n'), Newdepth is Depth+2, inodo(Z,Newdepth), imprimir(XS,Depth).
 
 inodo(nodo(E,As),Depth):- tab(Depth), write('Nodo '), write(E), write('\n'), Newdepth is Depth+2, imprimir(As,Newdepth).
