@@ -280,14 +280,17 @@ esqueleto(N,R,Esqueleto):-
 	esqueleto1(N,R,1,Hijos),
 	Esqueleto = esq(Hijos).
 
-esqueleto1(_,_,0,[]).
+esqueleto1(0,_,Len,Lista):-
+	zero(Len,Ceros),
+	Lista = [Ceros].
+
 esqueleto1(N,R,NumHijos,Niveles):-
 	esqueleto2(N,R,NumHijos,Hijos,M), % M: Cantidad de nodos en el siguiente nivel
 	NumNodos is N - M,
-	esqueleto1(N,R,NumNodos,Nivel),
+	esqueleto1(NumNodos,R,M,Nivel),
 	Niveles = [Hijos|Nivel].
 
-esqueleto2(0,_,_,[],0).
+esqueleto2(_,_,0,[],0).
 esqueleto2(N,R,Len,Nivel,M):-
 	rango(N,Opciones,1),
 	member(NumHijos,Opciones),
@@ -305,3 +308,9 @@ rango(N,Lista,Acum):-
 	Acum2 is Acum + 1,
 	rango(N,Lista2,Acum2),
 	Lista = [Acum|Lista2].
+
+zero(0,[]).
+zero(Len,Lista):-
+	Restantes is Len - 1,
+	zero(Restantes,Lista2),
+	Lista = [0|Lista2].
